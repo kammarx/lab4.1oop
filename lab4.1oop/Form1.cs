@@ -13,7 +13,7 @@ namespace lab4._1oop
     public partial class Form1 : Form
     {
         int numObj = 0;
-        Storage storage = new Storage(40);
+        Storage storage = new Storage();
         Graphics gr;
         public Form1()
         {
@@ -28,7 +28,8 @@ namespace lab4._1oop
 
         class Item
         {
-
+            public bool selected = false;
+            public int numofObj=0;
         }
 
         class CCircle: Item
@@ -80,7 +81,7 @@ namespace lab4._1oop
 		class Storage
 		{
             private int size;
-            private Item[] storage;
+            public Item[] storage;
             public Storage()
             {
                 size = 0;
@@ -98,9 +99,17 @@ namespace lab4._1oop
             {
                 return size;
             }
-            public void addObj(Item newObj,int q)
+            public void addObj(Item newObj)
             {
-                
+                Array.Resize(ref storage, size + 1);
+                storage[size] = newObj;
+                for (int i = 0; i < storage.Length; i++)
+                {
+                        storage[i].selected = false;
+                }
+                storage[size].selected = true;
+
+
 
             }
 
@@ -120,7 +129,22 @@ namespace lab4._1oop
 
             public void removeObj(int k)
             {
-                storage[k] = null;
+               if(size>1 && k < size)
+                {
+                    Item[] storage2 = new Item[size - k];
+                    for (int i = k + 1,j=0; i < size; i++,j++)
+                    {
+                        storage2[j] = storage[i];
+                    }
+                    for(int i = k,j=0; i < size - 1; i++,j++)
+                    {
+                        storage[i] = storage2[j];
+                    }
+                  
+                    Array.Resize(ref storage,storage.Length -1);
+
+
+                }
             }
 
 			public void setAllFalse()
