@@ -12,9 +12,9 @@ namespace lab4._1oop
 {
     public partial class Form1 : Form
     {
-        int numObj = 0;
-        Storage storage = new Storage();
-        Graphics gr;
+        int num = 0;
+        Storage storage = new Storage(0);
+       public Graphics gr;
         public Form1()
         {
             InitializeComponent();
@@ -28,18 +28,54 @@ namespace lab4._1oop
 
         class Item
         {
+
+            protected int x;
+            protected int y;
             public bool selected = false;
+            public bool coloured = false;
             public int numofObj=0;
+            private int size = 30;
+            public bool CheckClickOnObject(int x, int y)
+            {
+                if (((x - size) < x) && (x + size > x) && ((y - size) < y) && (y + size > y))
+                    return true;
+                else
+                    return false;
+            }
+            public void setCoords(int x_, int y_)
+            {
+                this.x = x_;
+                this.y = y_;
+            }
+            public virtual void printFigureRed(Graphics gr)
+            {
+                Console.WriteLine("figure");
+            }
+            public virtual void printFigureBlack(Graphics gr)
+            {
+                Console.WriteLine("figure");
+            }
+
+
+            public bool isSelected()
+            {
+                return selected;
+            }
+
         }
 
         class CCircle: Item
         {
-            private int x;
-            private int y;
+            
             private int rad;
-            bool selected = false;
+          
             private Pen pen;
-
+            public CCircle()
+            {
+                this.x = 0;
+                this.y = 0;
+                this.rad = 0;
+            }
             public CCircle(int x,int y)
             {
                 this.x = x;
@@ -47,7 +83,7 @@ namespace lab4._1oop
                 this.rad = 40;
                 selected = true;
             }
-
+        
             public int getX()
             {
                 return x;
@@ -56,6 +92,21 @@ namespace lab4._1oop
             {
                 return y;
             }
+
+            public override void printFigureRed(Graphics g)
+            {
+                    pen = new Pen(Color.Red, 3);
+                
+                g.DrawEllipse(pen, x, y, rad + rad, rad + rad);
+            }
+            public override void printFigureBlack(Graphics g)
+            {
+                pen = new Pen(Color.Black, 3);
+
+                g.DrawEllipse(pen, x, y, rad + rad, rad + rad);
+            }
+
+
             public void setSelectedTrue()
             {
                selected = true;
@@ -65,11 +116,7 @@ namespace lab4._1oop
                 selected = false;
             }
 
-            public bool isSelected()
-            {
-                return selected;
-            }
-
+    
 
 
         }
@@ -82,10 +129,10 @@ namespace lab4._1oop
 		{
             private int size;
             public Item[] storage;
-            public Storage()
-            {
-                size = 0;
-            }
+            //public Storage()
+            //{
+            //    size = 0;
+            //}
             public Storage(int size)
             {
                 this.size = size;
@@ -95,11 +142,11 @@ namespace lab4._1oop
                     storage[i] = null;
                 }
             }
-            int getCount()
+            public int getCount()
             {
                 return size;
             }
-            public void addObj(Item newObj)
+            public void addObj(Item newObj,int num)
             {
                 Array.Resize(ref storage, size + 1);
                 storage[size] = newObj;
@@ -108,11 +155,12 @@ namespace lab4._1oop
                         storage[i].selected = false;
                 }
                 storage[size].selected = true;
-
+                size++;
+                
 
 
             }
-
+           
             public Item getObj(int k)
             {
                 return storage[k];
@@ -146,14 +194,20 @@ namespace lab4._1oop
 
                 }
             }
-
-			public void setAllFalse()
+            public void printFigures(Graphics gr)
             {
                 for(int i = 0; i < size; i++)
                 {
-                    if (storage[i] != null)
+                    storage[i].printFigureRed(gr);
+                }
+            }
+
+            public void deleteSelectedObj()
+            {
+                for (int i = 0; i < size; i++) {
+                    if (storage[i].isSelected())
                     {
-                        storage[i] = null ;
+                        removeObj(i);
                     }
                 }
             }
@@ -164,19 +218,71 @@ namespace lab4._1oop
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
+            for (int i = 0; i < storage.getCount(); i++)
+            {
+                
+                    if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
+ 
           
+                storage.addObj(new CCircle(),num);
+            storage.getObj(num).setCoords(e.X, e.Y);
+            num++;
+            Invalidate();
 
         }
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
-            int xc = e.X;
-            int yc = e.Y;
-            gr = pictureBox1.CreateGraphics();
-            Pen pen = new Pen(Color.Red, 2);
-            gr.DrawEllipse(pen, xc, yc,20,20);
-            
+           
 
+            //for (int i = 0; i < storage.getCount(); i++)
+            //{
+
+            //    if (Control.ModifierKeys == Keys.Control && e.Button == MouseButtons.Left)
+            //    {
+            //        if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
+            //        {
+            //            storage.getObj(i).selected = true;
+            //            Invalidate();
+            //        }
+            //    }
+            //    else if (e.Button == System.Windows.Forms.MouseButtons.Left)
+            //    {
+
+            //        if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
+            //            storage.getObj(i).selected = true;
+            //        else
+            //            storage.getObj(i).selected= false;
+            //        Invalidate();
+
+            //    }
+            //}
+
+
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            for (int i = 0; i < storage.getCount(); i++)
+            {
+                if (storage.isObj(i)){
+                    if (storage.getObj(i).selected)
+                        storage.getObj(i).printFigureRed(e.Graphics);
+                    else storage.getObj(i).printFigureBlack(e.Graphics);
+
+                } 
+            }
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            //if(e.KeyData == Keys.Delete)
+            //{
+            //    storage.deleteSelectedObj();
+            //    gr.Clear(Color.Gray);
+            //    storage.printFigures(gr);
+                
+            //}
         }
     }
 }
