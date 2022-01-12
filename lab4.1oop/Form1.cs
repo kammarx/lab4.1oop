@@ -12,9 +12,12 @@ namespace lab4._1oop
 {
     public partial class Form1 : Form
     {
-        int num = 0;
+
         Storage storage = new Storage(0);
-       public Graphics gr;
+        int numberofobjects = 0;
+        public Graphics gr;
+        public bool prevSel=false;
+
         public Form1()
         {
             InitializeComponent();
@@ -22,8 +25,8 @@ namespace lab4._1oop
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //this.WindowState = FormWindowState.Maximized;
-         
+
+
         }
 
         class Item
@@ -33,25 +36,29 @@ namespace lab4._1oop
             protected int y;
             public bool selected = false;
             public bool coloured = false;
-            public int numofObj=0;
-            private int size = 30;
-            public bool CheckClickOnObject(int x, int y)
-            {
-                if (((x - size) < x) && (x + size > x) && ((y - size) < y) && (y + size > y))
-                    return true;
-                else
-                    return false;
-            }
+            public int rad = 20;
+            public int numObj = 0;
+
+
             public void setCoords(int x_, int y_)
             {
                 this.x = x_;
                 this.y = y_;
             }
-            public virtual void printFigureRed(Graphics gr)
+
+            public bool CheckClickOnObject(int x1, int y1)
+            {
+                if (((x1 - rad) < x) && (x1 + rad > x) && ((y1 - rad) < y) && (y1 + rad > y))
+                    return true;
+                else
+                    return false;
+            }
+
+            public virtual void printFigureRed()
             {
                 Console.WriteLine("figure");
             }
-            public virtual void printFigureBlack(Graphics gr)
+            public virtual void printFigureBlack()
             {
                 Console.WriteLine("figure");
             }
@@ -62,28 +69,27 @@ namespace lab4._1oop
                 return selected;
             }
 
+
         }
 
-        class CCircle: Item
+        class CCircle : Item
         {
-            
-            private int rad;
-          
-            private Pen pen;
+
             public CCircle()
             {
                 this.x = 0;
                 this.y = 0;
-                this.rad = 0;
+                this.rad = 35;
+                selected = true;
             }
-            public CCircle(int x,int y)
+            public CCircle(int x, int y)
             {
                 this.x = x;
                 this.y = y;
-                this.rad = 40;
+                this.rad = 35;
                 selected = true;
             }
-        
+
             public int getX()
             {
                 return x;
@@ -93,30 +99,41 @@ namespace lab4._1oop
                 return y;
             }
 
-            public override void printFigureRed(Graphics g)
+            public override void printFigureRed()
             {
-                    pen = new Pen(Color.Red, 3);
-                
-                g.DrawEllipse(pen, x, y, rad + rad, rad + rad);
-            }
-            public override void printFigureBlack(Graphics g)
-            {
-                pen = new Pen(Color.Black, 3);
 
-                g.DrawEllipse(pen, x, y, rad + rad, rad + rad);
+                Pen myPen = new Pen(Color.Red);
+                Graphics formGraphics;
+                formGraphics = Form.ActiveForm.CreateGraphics();
+
+                Rectangle ellipse = new Rectangle(x, y, rad, rad);
+                formGraphics.DrawEllipse(myPen, ellipse);
+                myPen.Dispose();
+                formGraphics.Dispose();
+            }
+            public override void printFigureBlack()
+            {
+                Pen myPen = new Pen(Color.Black);
+                Graphics formGraphics;
+                formGraphics = Form.ActiveForm.CreateGraphics();
+
+                Rectangle ellipse = new Rectangle(x, y, rad, rad);
+                formGraphics.DrawEllipse(myPen, ellipse);
+                myPen.Dispose();
+                formGraphics.Dispose();
             }
 
 
             public void setSelectedTrue()
             {
-               selected = true;
+                selected = true;
             }
             public void setSelectedFalse()
             {
                 selected = false;
             }
 
-    
+
 
 
         }
@@ -125,19 +142,19 @@ namespace lab4._1oop
 
 
 
-		class Storage
-		{
+        class Storage
+        {
             private int size;
-            public Item[] storage;
-            //public Storage()
-            //{
-            //    size = 0;
-            //}
+            Item[] storage;
+            public Storage()
+            {
+                size = 0;
+            }
             public Storage(int size)
             {
                 this.size = size;
                 this.storage = new Item[size];
-                for(int i = 0; i < size; i++)
+                for (int i = 0; i < size; i++)
                 {
                     storage[i] = null;
                 }
@@ -146,21 +163,21 @@ namespace lab4._1oop
             {
                 return size;
             }
-            public void addObj(Item newObj,int num)
+            public void addObj(Item newObj)
             {
-                Array.Resize(ref storage, size + 1);
+                Array.Resize(ref storage, storage.Length + 1);
                 storage[size] = newObj;
                 for (int i = 0; i < storage.Length; i++)
                 {
-                        storage[i].selected = false;
+                    storage[i].selected = false;
                 }
                 storage[size].selected = true;
                 size++;
-                
+
 
 
             }
-           
+
             public Item getObj(int k)
             {
                 return storage[k];
@@ -177,112 +194,107 @@ namespace lab4._1oop
 
             public void removeObj(int k)
             {
-               if(size>1 && k < size)
+                if (size > 1 && k < size)
                 {
-                    Item[] storage2 = new Item[size - k];
-                    for (int i = k + 1,j=0; i < size; i++,j++)
+                    Item[] storage2 = new Item[size - k-1];
+                    for (int i = k + 1, j = 0; i < size; i++, j++)
                     {
                         storage2[j] = storage[i];
                     }
-                    for(int i = k,j=0; i < size - 1; i++,j++)
+                    for (int i = k, j = 0; i < size - 1; i++, j++)
                     {
                         storage[i] = storage2[j];
                     }
-                  
-                    Array.Resize(ref storage,storage.Length -1);
-
+                    size--;
+                    Array.Resize(ref storage, size);
+                    
 
                 }
             }
-            public void printFigures(Graphics gr)
-            {
-                for(int i = 0; i < size; i++)
-                {
-                    storage[i].printFigureRed(gr);
-                }
-            }
-
-            public void deleteSelectedObj()
-            {
-                for (int i = 0; i < size; i++) {
-                    if (storage[i].isSelected())
-                    {
-                        removeObj(i);
-                    }
-                }
-            }
-
-           
-
-		}
-
-        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-        {
-            for (int i = 0; i < storage.getCount(); i++)
-            {
-                
-                    if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
- 
           
-                storage.addObj(new CCircle(),num);
-            storage.getObj(num).setCoords(e.X, e.Y);
-            num++;
-            Invalidate();
 
-        }
-
-        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
-        {
-           
-
-            //for (int i = 0; i < storage.getCount(); i++)
-            //{
-
-            //    if (Control.ModifierKeys == Keys.Control && e.Button == MouseButtons.Left)
-            //    {
-            //        if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
-            //        {
-            //            storage.getObj(i).selected = true;
-            //            Invalidate();
-            //        }
-            //    }
-            //    else if (e.Button == System.Windows.Forms.MouseButtons.Left)
-            //    {
-
-            //        if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
-            //            storage.getObj(i).selected = true;
-            //        else
-            //            storage.getObj(i).selected= false;
-            //        Invalidate();
-
-            //    }
-            //}
 
 
         }
 
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            for (int i = 0; i < storage.getCount(); i++)
-            {
-                if (storage.isObj(i)){
-                    if (storage.getObj(i).selected)
-                        storage.getObj(i).printFigureRed(e.Graphics);
-                    else storage.getObj(i).printFigureBlack(e.Graphics);
 
-                } 
-            }
-        }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            //if(e.KeyData == Keys.Delete)
-            //{
-            //    storage.deleteSelectedObj();
-            //    gr.Clear(Color.Gray);
-            //    storage.printFigures(gr);
+            if(e.KeyCode == Keys.Delete)
+            {
+                for(int i = 0; i < storage.getCount(); i++)
+                {
+                    if (prevSel) i--;
+
+                    if (storage.getObj(i).selected)
+                    {
+                        storage.removeObj(i);
+                        prevSel = true;
+                        numberofobjects--;
+                    }
+                    else if (!storage.getObj(i).selected) prevSel = false;
+                    Invalidate();
+                }
                 
-            //}
+            }
+        }
+
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            for (int i = 0; i < storage.getCount(); i++)
+            {
+
+                if (storage.getObj(i).selected)
+                {
+                    storage.getObj(i).printFigureRed();
+                }
+                else storage.getObj(i).printFigureBlack();
+
+
+            }
+        }
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+
+            for (int i = 0; i < storage.getCount(); i++)
+            {
+
+                if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
+                {
+                    return;
+                }
+
+            }
+            storage.addObj(new CCircle());
+            storage.getObj(numberofobjects).setCoords(e.X, e.Y);
+            numberofobjects++;
+            Invalidate();
+        }
+
+        private void Form1_MouseUp(object sender, MouseEventArgs e)
+        {
+            for (int i = 0; i < storage.getCount(); i++)
+            {
+                if (e.Button == MouseButtons.Left && Control.ModifierKeys == Keys.Control)
+                {
+                    if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
+                    {
+                        storage.getObj(i).selected = true;
+                    }
+                    Invalidate();
+                }
+                else if (e.Button == MouseButtons.Left)
+                {
+                    if (storage.getObj(i).CheckClickOnObject(e.X, e.Y))
+                    {
+                        storage.getObj(i).selected = true;
+                    }
+                    else storage.getObj(i).selected = false;
+                    Invalidate();
+                }
+            }
         }
     }
 }
