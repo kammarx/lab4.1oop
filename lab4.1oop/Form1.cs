@@ -17,7 +17,7 @@ namespace lab4._1oop
         int numberofobjects = 0;
         public Graphics gr;
         public bool prevSel=false;
-
+        int coun=0;
         public Form1()
         {
             InitializeComponent();
@@ -48,7 +48,8 @@ namespace lab4._1oop
 
             public bool CheckClickOnObject(int x1, int y1)
             {
-                if (((x1 - rad) < x) && (x1 + rad > x) && ((y1 - rad) < y) && (y1 + rad > y))
+                
+                if (((x1 - rad) < x) && (x1 +rad > x) && ((y1 - rad) < y) && (y1+rad > y))
                     return true;
                 else
                     return false;
@@ -79,14 +80,14 @@ namespace lab4._1oop
             {
                 this.x = 0;
                 this.y = 0;
-                this.rad = 35;
+                this.rad = 20;
                 selected = true;
             }
             public CCircle(int x, int y)
             {
                 this.x = x;
                 this.y = y;
-                this.rad = 35;
+                this.rad = 20;
                 selected = true;
             }
 
@@ -106,7 +107,7 @@ namespace lab4._1oop
                 Graphics formGraphics;
                 formGraphics = Form.ActiveForm.CreateGraphics();
 
-                Rectangle ellipse = new Rectangle(x, y, rad, rad);
+                Rectangle ellipse = new Rectangle(x-rad, y-rad, rad*2, rad*2);
                 formGraphics.DrawEllipse(myPen, ellipse);
                 myPen.Dispose();
                 formGraphics.Dispose();
@@ -117,23 +118,12 @@ namespace lab4._1oop
                 Graphics formGraphics;
                 formGraphics = Form.ActiveForm.CreateGraphics();
 
-                Rectangle ellipse = new Rectangle(x, y, rad, rad);
+                Rectangle ellipse = new Rectangle(x-rad, y-rad, rad*2, rad*2);
+               
                 formGraphics.DrawEllipse(myPen, ellipse);
                 myPen.Dispose();
                 formGraphics.Dispose();
             }
-
-
-            public void setSelectedTrue()
-            {
-                selected = true;
-            }
-            public void setSelectedFalse()
-            {
-                selected = false;
-            }
-
-
 
 
         }
@@ -194,7 +184,7 @@ namespace lab4._1oop
 
             public void removeObj(int k)
             {
-                if (size > 1 && k < size)
+                if (size > 0 && k < size)
                 {
                     Item[] storage2 = new Item[size - k-1];
                     for (int i = k + 1, j = 0; i < size; i++, j++)
@@ -211,6 +201,8 @@ namespace lab4._1oop
 
                 }
             }
+
+
           
 
 
@@ -224,16 +216,18 @@ namespace lab4._1oop
             if(e.KeyCode == Keys.Delete)
             {
                 for(int i = 0; i < storage.getCount(); i++)
-                {
-                    if (prevSel) i--;
+                { 
 
                     if (storage.getObj(i).selected)
                     {
                         storage.removeObj(i);
+                        
                         prevSel = true;
                         numberofobjects--;
+                        coun++;
                     }
                     else if (!storage.getObj(i).selected) prevSel = false;
+                    if (prevSel && i!=storage.getCount()) i--;
                     Invalidate();
                 }
                 
